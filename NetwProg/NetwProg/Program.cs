@@ -33,21 +33,20 @@ namespace MultiClientServer
             else
             {
                 MijnPoort = int.Parse(Console.ReadLine());
-                args = Console.ReadLine().Split(' ');
+              
             }
-
-            Console.WriteLine("ik ben server: " + MijnPoort);
             new Server(MijnPoort);
+            Console.WriteLine("ik ben server: " + MijnPoort);
             Console.Title = "NetChange " + MijnPoort.ToString();
             Thread[] threads = new Thread[4];
-            
+            args = Console.ReadLine().Split(' ');
             //threads[0] = new Thread(RecieveMessage);
             threads[1] = new Thread(ConsoleInteract);
             threads[2] = new Thread(GetRoutingTable);
             threads[3] = new Thread(AcceptConnection);
             threads[1].Start(1);
             threads[2].Start(2);
-            //threads[0].Start(0);
+           // threads[0].Start(0);
             threads[3].Start(3);
             
             //threads[1].Join();
@@ -90,8 +89,9 @@ namespace MultiClientServer
             }
             if (line.StartsWith("getNeighbours"))
             {
-                Console.WriteLine("getNeighbours bericht ontvangen vanf poort {0}", MijnPoort);
+                Console.WriteLine("getNeighbours bericht ontvangen op poort {0}", MijnPoort);
                 int poort = int.Parse(poorten[1]);
+                Console.WriteLine("getNeighbours bericht ontvangen vanaf poort {0}", poort);
                 for (int i = 0; i < Buren.Count; i++)
                 {
                     Buren[poort].Write.WriteLine("Neighbours: {0}", Buren.Keys.ElementAt(i));
@@ -103,7 +103,7 @@ namespace MultiClientServer
         static public void ConsoleInteract(object mt)
         {
             b = false;
-            while (b)
+            while (true)
             {
                 string line = Console.ReadLine();
                 string[] input = line.Split(' ');
@@ -118,7 +118,7 @@ namespace MultiClientServer
                 }
                 if (input[0] == "B")
                 {
-                    Buren[2].Write.WriteLine("ik verstuur zelf een bericht naar 1102 vanaf {0}", MijnPoort);
+                    Buren[2].Write.WriteLine("getNeighbours: {0}", MijnPoort);
                     Console.WriteLine("input B wordt herkend");
                 }
                 if (input[0] == "C")
@@ -136,7 +136,7 @@ namespace MultiClientServer
 
         static public void AcceptConnection(object mt)
         {
-            while (true)
+            /*while (true)
             {
                 string input = Console.ReadLine();
                 if (input.StartsWith("verbind"))
@@ -160,7 +160,7 @@ namespace MultiClientServer
                     else
                         Buren[poort].Write.WriteLine(MijnPoort + ": " + delen[1]);
                 }
-            }
+            }*/
             
             
             for (int i = 1; i < args.Length; i++)
@@ -176,12 +176,12 @@ namespace MultiClientServer
                         else
                         {
                             // Leg verbinding aan (als client)
-                            Program.Buren.Add(poort, new Connection(poort));
+                            Buren.Add(poort, new Connection(poort));
                             RoutingTable.Add(poort, 0);
-                            Buren[poort].Write.WriteLine("getNeighbours: {0}", MijnPoort);
 
                         }
                     }
+                    
                 }
                 
             }
