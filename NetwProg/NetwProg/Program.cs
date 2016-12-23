@@ -6,6 +6,27 @@ using System.Threading;
 
 namespace MultiClientServer
 {
+    class Route
+    {
+        public int costen;
+        public int poortnummer;
+
+        public int Cost
+        {
+            get { return costen; }
+        }
+
+        public int Poortnummer
+        {
+            get { return poortnummer; }
+        }
+
+        public Route(int cost, int prtnr)
+        {
+            costen = cost;
+            poortnummer = prtnr;
+        }
+    }
     class Program
     {
         static public int MijnPoort;
@@ -26,7 +47,7 @@ namespace MultiClientServer
 
         static void Main(string[] arg)
         {
-            Console.WriteLine("Op welke poort ben ik server? ");
+            //Console.WriteLine("Op welke poort ben ik server? ");
             args = arg;
 
             if (arg.Length > 0)
@@ -37,10 +58,10 @@ namespace MultiClientServer
             else
             {
                 MijnPoort = int.Parse(Console.ReadLine());
-              
             }
+
             new Server(MijnPoort);
-            Console.WriteLine("ik ben server: " + MijnPoort);
+           // Console.WriteLine("ik ben server: " + MijnPoort);
             Console.Title = "NetChange " + MijnPoort.ToString();
             
             //args = Console.ReadLine().Split(' ');
@@ -63,7 +84,6 @@ namespace MultiClientServer
   
         static public void GetRoutingTable(object mt)
         {
-            
                 for (int i = 0; i < Buren.Count; i++)
                 {
                     lock (Lock)
@@ -132,7 +152,7 @@ namespace MultiClientServer
                 string[] input = line.Split(' ');
                 if (input[0] == "R")
                 {
-                    Console.WriteLine("input R wordt herkend");
+                    //Console.WriteLine("input R wordt herkend");
                     for (int i = 0; i < Buren.Count; i++)
                     {
                         Console.WriteLine(Buren.ElementAt(i));
@@ -141,7 +161,7 @@ namespace MultiClientServer
                 }
                 if (input[0] == "B")
                 {
-                    Console.WriteLine("input B wordt herkend");
+                    //Console.WriteLine("input B wordt herkend");
 
                     if (Buren.ContainsKey(int.Parse(input[1])))
                     {
@@ -153,7 +173,7 @@ namespace MultiClientServer
                         Buren[int.Parse(input[1])].Write.WriteLine(msg);
                     }
                     else
-                        Console.WriteLine("Poort niet gevonden");
+                        Console.WriteLine("Poort {0} is niet bekend" , int.Parse(input[1]));
                 }
                 if (input[0] == "C")
                 {
@@ -166,8 +186,10 @@ namespace MultiClientServer
                         {
                             // Leg verbinding aan (als client)
                             Buren.Add(poort, new Connection(poort));
-                            RoutingTable.Add(poort, 0);
-
+                            Console.WriteLine("Verbonden: " + poort);
+                            threads[2] = new Thread(GetRoutingTable);
+                            threads[2].Start();
+                            threads[2].Join();
                         }
                     }
                 }
@@ -182,6 +204,7 @@ namespace MultiClientServer
                         {
                             Buren.Remove(poort);
                             RoutingTable.Remove(poort);
+                            Console.WriteLine("Verbroken: " + poort);
                         }
                     }
                 }
@@ -194,11 +217,12 @@ namespace MultiClientServer
                 {
                     threads[2] = new Thread(GetRoutingTable);
                     threads[2].Start();
+                    threads[2].Join();
                     for (int i = 0; i < RoutingTable.Count; i++)
                     {
                         Console.WriteLine("{0} {1} {2}", RoutingTable.Keys.ElementAt(i), RoutingTable.Values.ElementAt(i), MijnPoort);
                     }
-                    threads[2].Join();
+                    
                 }
 
                 if (line.StartsWith("verbind"))
@@ -234,40 +258,16 @@ namespace MultiClientServer
                         {
                             // Leg verbinding aan (als client)
                             Buren.Add(poort, new Connection(poort));
-                            
+                            Console.WriteLine("Verbonden: " + poort);
+                            threads[2] = new Thread(GetRoutingTable);
+                            threads[2].Start();
+                            threads[2].Join();
                         }
                     }
 
                 }
 
             }
-
-            /*while (true)
-            {
-                string input = Console.ReadLine();
-                if (input.StartsWith("verbind"))
-                {
-                    int poort = int.Parse(input.Split()[1]);
-                    if (Buren.ContainsKey(poort))
-                        Console.WriteLine("Hier is al verbinding naar!");
-                    else
-                    {
-                        // Leg verbinding aan (als client)
-                        Buren.Add(poort, new Connection(poort));
-                    }
-                }
-                else
-                {
-                    // Stuur berichtje
-                    string[] delen = input.Split(new char[] { ' ' }, 2);
-                    int poort = int.Parse(delen[0]);
-                    if (!Buren.ContainsKey(poort))
-                        Console.WriteLine("Hier is geen verbinding naar!");
-                    else
-                        Buren[poort].Write.WriteLine(MijnPoort + ": " + delen[1]);
-                }
-            }
-            */
             
         }
     }
