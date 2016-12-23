@@ -65,9 +65,13 @@ namespace MultiClientServer
             {
                 for (int i = 0; i < Buren.Count; i++)
                 {
-                    if (!RoutingTable.Keys.Contains(Buren.Keys.ElementAt(i)))
+                    lock (Lock)
                     {
-                        RoutingTable.Add(Buren.Keys.ElementAt(i), 1);
+                        if (!RoutingTable.Keys.Contains(Buren.Keys.ElementAt(i)))
+                        {
+                            RoutingTable.Add(Buren.Keys.ElementAt(i), 1);
+
+                        }
                     }
                 }
             }
