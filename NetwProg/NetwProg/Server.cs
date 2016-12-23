@@ -36,7 +36,7 @@ namespace MultiClientServer
                 
 
                 // Zet de nieuwe verbinding in de verbindingslijst
-                lock (Program.Buren)
+                lock (Program.Lock)
                 {
                     if (!Program.Buren.ContainsKey(zijnPoort))
                     {

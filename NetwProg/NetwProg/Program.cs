@@ -18,7 +18,9 @@ namespace MultiClientServer
 
         static public String[] args;
 
-        static bool b; 
+        static bool b;
+
+        static public object Lock = new object();
 
         static void Main(string[] arg)
         {
@@ -134,7 +136,19 @@ namespace MultiClientServer
                 }
                 if (input[0] == "C")
                 {
+                    lock (Lock)
+                    {
+                        int poort = int.Parse(input[1]);
+                        if (Buren.ContainsKey(poort))
+                            Console.WriteLine("Hier is al verbinding naar!");
+                        else
+                        {
+                            // Leg verbinding aan (als client)
+                            Buren.Add(poort, new Connection(poort));
+                            RoutingTable.Add(poort, 0);
 
+                        }
+                    }
                 }
                 if (input[0] == "D")
                 {
@@ -158,7 +172,7 @@ namespace MultiClientServer
                 string input = args[i];
                 if (int.Parse(args[i]) > 0)
                 {
-                    lock (Buren)
+                    lock (Lock)
                     {
                         int poort = int.Parse(input);
                         if (Buren.ContainsKey(poort))
