@@ -33,13 +33,16 @@ namespace MultiClientServer
                 // De server weet niet wat de poort is van de client die verbinding maakt, de client geeft dus als onderdeel van het protocol als eerst een bericht met zijn poort
                 int zijnPoort = int.Parse(clientIn.ReadLine().Split()[1]);
 
-                Console.WriteLine("Client ({0}) maakt verbinding met mij als server({1}):" ,zijnPoort, Program.MijnPoort);
+                
 
                 // Zet de nieuwe verbinding in de verbindingslijst
                 lock (Program.Buren)
                 {
-                    if(!Program.Buren.ContainsKey(zijnPoort))
+                    if (!Program.Buren.ContainsKey(zijnPoort))
+                    {
+                        Console.WriteLine("Client ({0}) maakt verbinding met mij als server({1}):", zijnPoort, Program.MijnPoort);
                         Program.Buren.Add(zijnPoort, new Connection(clientIn, clientOut));
+                    }
                 }
             }
         }
