@@ -152,7 +152,17 @@ namespace MultiClientServer
                 }
                 if (input[0] == "D")
                 {
-
+                    lock(Lock)
+                    {
+                        int poort = int.Parse(input[1]);
+                        if (!Buren.ContainsKey(poort))
+                            Console.WriteLine("Hier is geen verbinding naar");
+                        else
+                        {
+                            Buren.Remove(poort);
+                            RoutingTable.Remove(poort);
+                        }
+                    }
                 }
                 if (input[0] == "T")
                 {
