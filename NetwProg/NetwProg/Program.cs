@@ -118,8 +118,19 @@ namespace MultiClientServer
                 }
                 if (input[0] == "B")
                 {
-                    Buren[int.Parse(input[1])].Write.WriteLine("getNeighbours: {0}", MijnPoort);
                     Console.WriteLine("input B wordt herkend");
+
+                    if (Buren.ContainsKey(int.Parse(input[1])))
+                    {
+                        string msg = input[2];
+                        for (int i = 3; i < input.Length; i++)
+                        {
+                            msg += (" " + input[i]);
+                        }
+                        Buren[int.Parse(input[1])].Write.WriteLine(msg);
+                    }
+                    else
+                        Console.WriteLine("Poort niet gevonden");
                 }
                 if (input[0] == "C")
                 {
@@ -128,6 +139,11 @@ namespace MultiClientServer
                 if (input[0] == "D")
                 {
 
+                }
+                if (input[0] == "T")
+                {
+                    Buren[int.Parse(input[1])].Write.WriteLine("getNeighbours: {0}", MijnPoort);
+                    Console.WriteLine("input T wordt herkend");
                 }
             }
 
