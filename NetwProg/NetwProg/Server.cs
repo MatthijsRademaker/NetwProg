@@ -38,13 +38,8 @@ namespace MultiClientServer
                 // Zet de nieuwe verbinding in de verbindingslijst
                 lock (Program.Buren)
                 {
-                    if (!Program.Buren.ContainsKey(zijnPoort))
-                    {
+                    if(!Program.Buren.ContainsKey(zijnPoort))
                         Program.Buren.Add(zijnPoort, new Connection(clientIn, clientOut));
-                    }
-                    else
-                    {
-                    }
                 }
             }
         }

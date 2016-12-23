@@ -25,13 +25,15 @@ namespace MultiClientServer
             Console.WriteLine("Op welke poort ben ik server? ");
             args = arg;
 
-            if (args.Length > 0)
+            if (arg.Length > 0)
             {
                 MijnPoort = int.Parse(args[0]);
+                args = arg;
             }
             else
             {
                 MijnPoort = int.Parse(Console.ReadLine());
+                args = Console.ReadLine().Split(' ');
             }
 
             Console.WriteLine("ik ben server: " + MijnPoort);
@@ -48,9 +50,9 @@ namespace MultiClientServer
             //threads[0].Start(0);
             threads[3].Start(3);
             
-            threads[1].Join();
-            threads[2].Join();
-            threads[3].Join();
+            //threads[1].Join();
+            //threads[2].Join();
+            //threads[3].Join();
             //threads[0].Join();
 
 
@@ -88,6 +90,7 @@ namespace MultiClientServer
             }
             if (line.StartsWith("getNeighbours"))
             {
+                Console.WriteLine("getNeighbours bericht ontvangen vanf poort {0}", MijnPoort);
                 int poort = int.Parse(poorten[1]);
                 for (int i = 0; i < Buren.Count; i++)
                 {
@@ -99,7 +102,8 @@ namespace MultiClientServer
 
         static public void ConsoleInteract(object mt)
         {
-            while (true)
+            b = false;
+            while (b)
             {
                 string line = Console.ReadLine();
                 string[] input = line.Split(' ');
@@ -114,7 +118,8 @@ namespace MultiClientServer
                 }
                 if (input[0] == "B")
                 {
-
+                    Buren[2].Write.WriteLine("ik verstuur zelf een bericht naar 1102 vanaf {0}", MijnPoort);
+                    Console.WriteLine("input B wordt herkend");
                 }
                 if (input[0] == "C")
                 {
@@ -131,31 +136,18 @@ namespace MultiClientServer
 
         static public void AcceptConnection(object mt)
         {
-            
-            for (int i = 1; i < args.Length; i++)
+            while (true)
             {
-                string input = args[i];
-                if (int.Parse(args[i]) > 0)
+                string input = Console.ReadLine();
+                if (input.StartsWith("verbind"))
                 {
-                    int poort = int.Parse(input);
-                    lock (Buren)
+                    int poort = int.Parse(input.Split()[1]);
+                    if (Buren.ContainsKey(poort))
+                        Console.WriteLine("Hier is al verbinding naar!");
+                    else
                     {
-
-                        if (Buren.ContainsKey(poort))
-                            Console.WriteLine("Hier is al verbinding naar!");
-                        else
-                        {
-                            // Leg verbinding aan (als client)
-                            if ((a = new Connection(poort)) != null)
-                            {
-                                Buren.Add(poort, a);
-                                RoutingTable.Add(poort, 0);
-                                Buren[poort].Write.WriteLine("getNeighbours: {0}", MijnPoort);
-                                //Console.WriteLine("ik verstuur wel berichten in de routingtable acceptconnection method");
-                            }
-                            Console.WriteLine("er is nu verbinding met poort als client: " + poort);
-                            b = true;
-                        }
+                        // Leg verbinding aan (als client)
+                        Buren.Add(poort, new Connection(poort));
                     }
                 }
                 else
@@ -164,10 +156,34 @@ namespace MultiClientServer
                     string[] delen = input.Split(new char[] { ' ' }, 2);
                     int poort = int.Parse(delen[0]);
                     if (!Buren.ContainsKey(poort))
-                        Console.WriteLine("Hier is al verbinding naar!");
+                        Console.WriteLine("Hier is geen verbinding naar!");
                     else
                         Buren[poort].Write.WriteLine(MijnPoort + ": " + delen[1]);
                 }
+            }
+            
+            
+            for (int i = 1; i < args.Length; i++)
+            {
+                string input = args[i];
+                if (int.Parse(args[i]) > 0)
+                {
+                    lock (Buren)
+                    {
+                        int poort = int.Parse(input);
+                        if (Buren.ContainsKey(poort))
+                            Console.WriteLine("Hier is al verbinding naar!");
+                        else
+                        {
+                            // Leg verbinding aan (als client)
+                            Program.Buren.Add(poort, new Connection(poort));
+                            RoutingTable.Add(poort, 0);
+                            Buren[poort].Write.WriteLine("getNeighbours: {0}", MijnPoort);
+
+                        }
+                    }
+                }
+                
             }
 
             
