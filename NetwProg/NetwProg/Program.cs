@@ -22,6 +22,8 @@ namespace MultiClientServer
 
         static public object Lock = new object();
 
+        static public Thread[] threads = new Thread[4];
+
         static void Main(string[] arg)
         {
             Console.WriteLine("Op welke poort ben ik server? ");
@@ -40,7 +42,7 @@ namespace MultiClientServer
             new Server(MijnPoort);
             Console.WriteLine("ik ben server: " + MijnPoort);
             Console.Title = "NetChange " + MijnPoort.ToString();
-            Thread[] threads = new Thread[4];
+            
             //args = Console.ReadLine().Split(' ');
             //threads[0] = new Thread(RecieveMessage);
             threads[1] = new Thread(ConsoleInteract);
@@ -52,7 +54,7 @@ namespace MultiClientServer
             threads[3].Start(3);
 
             //threads[1].Join();
-            //threads[2].Join();
+            threads[2].Join();
             //threads[3].Join();
             //threads[0].Join();
             RoutingTable.Add(MijnPoort, 0);
@@ -61,8 +63,7 @@ namespace MultiClientServer
   
         static public void GetRoutingTable(object mt)
         {
-            while (true)
-            {
+            
                 for (int i = 0; i < Buren.Count; i++)
                 {
                     lock (Lock)
@@ -74,7 +75,7 @@ namespace MultiClientServer
                         }
                     }
                 }
-            }
+            
         }
 
         static public void RecieveMessage(string line)
@@ -191,10 +192,13 @@ namespace MultiClientServer
                 }
                 if (input[0] == "RT")
                 {
+                    threads[2] = new Thread(GetRoutingTable);
+                    threads[2].Start();
                     for (int i = 0; i < RoutingTable.Count; i++)
                     {
                         Console.WriteLine("{0} {1} {2}", RoutingTable.Keys.ElementAt(i), RoutingTable.Values.ElementAt(i), MijnPoort);
                     }
+                    threads[2].Join();
                 }
 
                 if (line.StartsWith("verbind"))
@@ -230,8 +234,7 @@ namespace MultiClientServer
                         {
                             // Leg verbinding aan (als client)
                             Buren.Add(poort, new Connection(poort));
-                            RoutingTable.Add(poort, 0);
-
+                            
                         }
                     }
 
